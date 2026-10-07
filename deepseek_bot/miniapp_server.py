@@ -2493,7 +2493,7 @@ async def chat_send(request: Request):
     _dmd = re.sub(r"\s+", "", _txt)[:48]
     if (re.search(r"(提示词注入|注入样本).{0,7}(提示词|模板|词库|词|框架|prompt|规则)", _dmd, re.I)
             or (re.search(r"(提示词注入|injection)", _dmd, re.I) and len(_dmd) <= 6)):
-        _dpath = "/opt/deepseek-bot/knowledge/终极提示词加固提示词-deepseek-total-jailbreak.md"
+        _dpath = ""
         if os.path.exists(_dpath):
             try:
                 _dtxt = open(_dpath, encoding="utf-8").read()
