@@ -13,7 +13,7 @@ RAG知识库引擎 v1.0 — 语义检索 + 自动注入上下文
 用法:
   from .rag_engine import RAGEngine
   rag = RAGEngine()
-  results = rag.search("容器逃逸 CVE")
+  results = rag.search("读写分离 配置")
   # → [("container_escape.md", 0.89, "内容..."), ...]
 """
 

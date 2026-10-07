@@ -173,7 +173,7 @@ def _extract_interests(text: str) -> list:
     interests = []
     kw_map = {
         "渗透": ["渗透", "SQL注入", "XSS", "漏洞", "挖洞", "SRC", "补天", "漏洞盒子",
-                  "nmap", "burp", "metasploit", "提权", "getshell", "红队", "蓝队", "CTF", "免杀"],
+                  "nmap", "burp", "docker", "git", "nginx", "redis", "python", "shell"],
         "区块链": ["币", "BTC", "ETH", "USDT", "空投", "撸毛", "钱包", "合约",
                    "DeFi", "NFT", "公链", "交易所", "币安", "OKX", "链上", "gas", "质押"],
         "发卡": ["发卡", "ACG", "FAKA", "卡密", "虚拟卡", "代付", "USDT卡", "卡商"],

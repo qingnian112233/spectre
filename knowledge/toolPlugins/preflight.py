@@ -9,7 +9,7 @@
 本鱼的体检维度:
   ① 工具链是否在 PATH / 磁盘上（nmap/sqlmap/ffuf/hydra/john/nuclei/msf 等）
   ② 必需环境变量是否设置（FOFA_KEY / VPS / proxy 等）
-  ③ 知识库关键文件是否存在（pentest.md / redteam-作战.md / SPECTRE / src-hunting）
+  ③ 知识库目录是否可读写（knowledge/ 及其子目录）
   ④ 外部基础设施占位符是否还没填（<你的VPS_IP> TARGET HOST 之类）
 输出: 每项 available / broken + 缺什么 + 怎么办（降级方案）
 """
@@ -32,7 +32,7 @@ ENV_NEEDS = {
     "DSH_HOME": "工作区根目录（缺了默认 /opt/deepseek-bot）",
 }
 KB_FILES = [
-    "pentest.md", "redteam-作战.md", "SPECTRE-全谱攻击面作战总纲.md",
+    "README.md",
     "src-hunting-总纲.md", "quick-payloads.md", "react-nextjs-rce-family.md",
     "redteam-deep-exploitation-ch9.md",
 ]

@@ -478,7 +478,7 @@ const ROLE_META: Record<string, [string, string]> = {
   recon: ['侦察', 'text-role-recon'],
   audit: ['审计', 'text-role-audit'],
   exploit: ['利用', 'text-role-exploit'],
-  evasion: ['免杀', 'text-role-evasion'],
+  evasion: ['加固', 'text-role-evasion'],
   lateral: ['横向', 'text-role-lateral'],
   report: ['报告', 'text-role-report'],
 }
