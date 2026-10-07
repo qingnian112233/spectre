@@ -1,0 +1,1 @@
+{"name": "market_watch", "description": "multi-coin watch multi crypto with 24h change pct; param coins CSV like btc,eth,sol,ton,trx,usdt; default BTC/ETH/SOL/TON/TRX/USDT", "schema": {"type": "object", "properties": {"coins": {"type": "string"}}, "required": []}, "exec": "/opt/deepseek-bot/knowledge/toolPlugins/market_watch.py", "admin_only": true, "timeout": 30}

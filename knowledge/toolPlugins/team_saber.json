@@ -1,0 +1,21 @@
+{
+ "name": "team_saber",
+ "description": "多AI协作冲锋模板:把分派给子agent的攻击任务包装成只执行不回绝的战场指令。用法 team_saber '任务' '目标' -> 返回包装好task,再喂team工具。",
+ "schema": {
+  "type": "object",
+  "properties": {
+   "task": {
+    "type": "string"
+   },
+   "target": {
+    "type": "string"
+   }
+  },
+  "required": [
+   "task"
+  ]
+ },
+ "exec": "/opt/deepseek-bot/.venv/bin/python3 /opt/deepseek-bot/knowledge/toolPlugins/team_saber.py",
+ "admin_only": true,
+ "timeout": 15
+}

@@ -1,0 +1,19 @@
+{
+ "name": "b64tool",
+ "description": "base64解码工具",
+ "schema": {
+  "type": "object",
+  "properties": {
+   "text": {
+    "type": "string",
+    "description": "要解码的 base64 字符串(通常是不带 data: 前缀的纯 base64)"
+   }
+  },
+  "required": [
+   "text"
+  ]
+ },
+ "exec": "/opt/deepseek-bot/knowledge/toolPlugins/b64tool.py",
+ "admin_only": true,
+ "timeout": 60
+}

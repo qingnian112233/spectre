@@ -1,0 +1,15 @@
+{
+ "name": "parse_init_data",
+ "description": "解析Telegram WebApp initData字符串",
+ "schema": {
+  "type": "object",
+  "properties": {
+   "init_data": {
+    "type": "string"
+   }
+  }
+ },
+ "exec": "/opt/deepseek-bot/knowledge/toolPlugins/parse_init_data.py",
+ "admin_only": true,
+ "timeout": 60
+}

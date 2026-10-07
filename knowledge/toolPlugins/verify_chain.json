@@ -1,0 +1,24 @@
+{
+ "name": "verify_chain",
+ "description": "闭环验证层(L4自主红队轴承③): 把'我觉得有洞'升级成'硬证据+置信度打分'——时间盲注验证(对照+多次采样+扣抖动, 防网络抖动误判)/布尔盲注验证(真假条件差异+一致性)/报错回显验证/疑似SQLi形态判定/置信度打分(0-100, <40不成立,40-70存疑,>=70成立, 未证实项不计分绝不吹成立)。op=timing/boolean/echo/score/sqlishape。触发词: 闭环验证/置信度/验证漏洞/去注水",
+ "schema": {
+  "type": "object",
+  "properties": {
+   "op": {"type": "string", "enum": ["timing", "boolean", "echo", "score", "sqlishape"], "description": "timing=时间盲注验证 / boolean=布尔验证 / echo=报错回显验证 / score=置信度打分 / sqlishape=疑似SQLi形态判定"},
+   "base_url": {"type": "string", "description": "timing: 基址(含已有参数前缀)"},
+   "payloads": {"type": "array", "description": "timing: payload列表", "items": {"type": "string"}},
+   "rounds": {"type": "integer", "description": "采样轮次,默认3"},
+   "sleep_s": {"type": "number", "description": "payload声称的sleep秒数,默认5"},
+   "url_true": {"type": "string", "description": "boolean: 真条件URL"},
+   "url_false": {"type": "string", "description": "boolean: 假条件URL"},
+   "url": {"type": "string", "description": "echo: 测试URL"},
+   "evidence": {"type": "array", "description": "score: 证据列表[{type,real,detail}]", "items": {"type": "object"}},
+   "payload": {"type": "string", "description": "sqlishape: 疑似注入payload"},
+   "framework": {"type": "string", "description": "sqlishape: 框架,默认laravel7"}
+  },
+  "required": ["op"]
+ },
+ "exec": "/opt/deepseek-bot/knowledge/toolPlugins/verify_chain.py",
+ "admin_only": true,
+ "timeout": 240
+}

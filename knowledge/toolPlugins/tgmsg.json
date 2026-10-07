@@ -1,0 +1,19 @@
+{
+ "name": "tgmsg",
+ "description": "TG 双号工具统一入口(走常驻 daemon, 默认账号 wang, 加 acct=naiwa 换号)。**拿小程序 initData 就用它**: act=webapp bot=@某bot(打开小程序, 返回 webview URL + tgWebAppData 里的 initData); 有目标 bot token 时 act=initdata token=<bot_token> 本地直接签一份(不用开小程序); 批量 act=bulkwebapp bots=@a,@b 或 bots=/tmp/bots.txt(结果落盘 webapp_harvest/)。其他动作: act=buttons group=群 id=消息ID(看按钮) / act=click group=群 id=消息ID row=0 col=1(点按钮, 常用来点 startapp 进小程序) / act=dialogs limit=20 / act=search target=群 keyword=词 / act=members target=群 / act=groupinfo target=群 / act=user target=@用户名 / act=send to=群 text=内容 / act=react to=群 id=消息ID emoji=👍 / act=join link=邀请链接。读单条消息(默认动作, 不写 act 时): q='群名或ID:消息ID[:raw]', 例 q='现金红包:3570'。也接受 JSON 写法 {\"act\":\"webapp\",\"bot\":\"@xxx\"}。返回带 TGMSG 头。H5 说明: 不是小程序、只是普通网页的目标, Telegram 侧按规则**不给** initData(不是工具的问题); 那种目标要 URL+query 参数更有用, 需要 initData 就用目标 token 走 act=initdata。",
+ "schema": {
+  "type": "object",
+  "properties": {
+   "q": {
+    "type": "string",
+    "description": "一个字符串装全部参数。act 写法: 'act=webapp bot=@xxx' / 'act=initdata token=xxx' / 'act=buttons group=群 id=3570' / 'act=click group=群 id=3570 row=0 col=1' / 'act=bulkwebapp bots=/tmp/bots.txt' / 'act=dialogs limit=20'。不写 act 时按'读单条消息'走: '群名或ID:消息ID[:raw]'。可加 acct=naiwa 换账号。"
+   }
+  },
+  "required": [
+   "q"
+  ]
+ },
+ "exec": "/opt/deepseek-bot/knowledge/toolPlugins/tgmsg.py",
+ "timeout": 300,
+ "admin_only": true
+}

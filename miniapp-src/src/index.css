@@ -1,0 +1,535 @@
+/* ============================================================================
+   主题: **直接引用 DSH 自己的样式源码**(从 github.com/deepseek-ai/deepseek-harness 的
+   packages/client/ui-theme/src/styles/ 拿的, MIT) —— 亮/暗切换靠 body[data-ds-dark-theme],
+   所有 --dsw-* token 都是原值, 一个都没自己编。
+   组件: packages/client/ui-primitives(MIT) → src/dsh/*, 也是原样 vendored。
+   Tailwind 只用来做布局(flex/gap/padding), 配色统一映射到 --dsw-* 变量。
+   ============================================================================ */
+@import "tailwindcss";
+@import "./dsh/theme/design-platform.css";
+@import "./dsh/theme/base.css";
+@import "./dsh/theme/scrollbar.css";
+@import "./dsh/theme/corner-shape.css";
+
+@custom-variant dark (&:where(body[data-ds-dark-theme], body[data-ds-dark-theme] *));
+
+@theme inline {
+  --color-bg: var(--dsw-alias-bg-base);
+  --color-card: var(--dsw-alias-bg-layer-1);
+  --color-muted: var(--dsw-alias-bg-layer-2);
+  --color-muted2: var(--dsw-alias-bg-layer-3);
+  --color-line: var(--dsw-alias-border-l2);
+  --color-lineweak: var(--dsw-alias-border-l1);
+  --color-fg: var(--dsw-alias-label-primary);
+  --color-fg2: var(--dsw-alias-label-secondary);
+  --color-fg3: var(--dsw-alias-label-tertiary);
+  --color-fg4: var(--dsw-alias-label-caption);
+  --color-primary: var(--dsw-alias-button-primary-fill);
+  --color-primaryfg: var(--dsw-alias-label-primary-foreground);
+  --color-accent: var(--dsw-alias-brand-primary-new-colorprimary-new-color, var(--dsw-static-deepseek-450));
+  --color-soft: var(--dsw-specific-bubble);
+  --color-soft2: var(--dsw-specific-sidebar-nav-item-active-accent);
+  --color-sidebar: var(--dsw-specific-sidebar-fill);
+  --color-ok: var(--dsw-static-green-400);
+  --color-warn: var(--dsw-static-amber-400);
+  --color-err: var(--dsw-static-red-600);
+  /* ★2026-10-05 子代理树的「每个角色一个颜色」(老板: 分层做一个颜色的)。
+     全部映射到 DSH 静态色板 —— 不硬编码 Tailwind 调色板, 亮/暗主题都跟着变。 */
+  --color-role-recon: var(--dsw-static-blue-400);
+  --color-role-audit: var(--dsw-static-deepseek-400);
+  --color-role-exploit: var(--dsw-static-red-400);
+  --color-role-evasion: var(--dsw-static-amber-400);
+  --color-role-lateral: var(--dsw-static-green-400);
+  --color-role-report: var(--dsw-static-neutral-400);
+  --color-role-other: var(--dsw-static-neutral-500);
+  --font-sans: var(--dsw-font-family);
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+}
+
+/* ===== 手机适配(2026-09-20 老板「怎么又不兼容手机了」)=====
+   ① iOS 动态视口: `100%` 是静态视口, Telegram 展开 / 键盘弹出后不更新 → 底部输入栏被顶出屏幕,
+      用 dvh 顶上(老浏览器不支持 @supports 的会留 100% 回退)。
+   ② index.html 声明了 viewport-fit=cover 却没人消费 env(safe-area-inset-*) → 刘海 / Home 条压住内容。
+   ③ iOS 输入框字号 <16px 会在聚焦时自动放大整页 —— 见文件末尾窄屏块。 */
+html, body, #root { height: 100%; }
+@supports (height: 100dvh) {
+  html, body, #root { height: 100dvh; }
+}
+body {
+  margin: 0; overflow-x: hidden;
+  background: var(--dsw-alias-bg-base); color: var(--dsw-alias-label-primary);
+  -webkit-text-size-adjust: 100%; text-size-adjust: 100%;
+}
+* { box-sizing: border-box; }
+
+/* 安全区: 非 iOS 设备 env() 一律取 0, 加了没有副作用 */
+.pad-safe-t { padding-top: env(safe-area-inset-top, 0px); }
+.pad-safe-b { padding-bottom: env(safe-area-inset-bottom, 0px); }
+.pad-safe-x { padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px); }
+
+/* 我自己的小补丁(放在 DSH 样式之后, 同权重时以我为准) */
+.dsh-iconbtn { padding: 0 9px !important; }
+.dsh-iconbtn2 { padding: 0 9px; }
+.break-any { overflow-wrap: anywhere; word-break: break-word; }
+.tap { -webkit-tap-highlight-color: transparent; }
+
+/* ===== 液态玻璃(2026-10-07 老板「上液态玻璃 模仿 ios 的」+「那个框框显示好一点 不然太淡了 颜色搞好点」) =====
+   iOS 26 Liquid Glass 的可复制特征就三条:
+     ① 透光层 = 背景模糊 + 饱和度拉高, 不是单纯把底色调透明;
+     ② 一道"上沿亮、下沿暗"的镜面高光 —— 玻璃的立体感**全来自它**, 不来自 border;
+     ③ 极浅的内描边 + 外投影, 让玻璃浮在内容之上。
+   DSH 原来的 border-l1/l2 在暗色下几乎看不见(就是老板说的"太淡"), 所以这儿**不动原 token**,
+   另加一组 .lg-* 给卡片复用。内描边用 inset box-shadow 而不是 border, 把 border 整条让给
+   左边那道角色色条(border-l-[3px])。
+   回退: 不支持 backdrop-filter 的老 WebView 直接给实体底色, 不闪。 */
+.lg {
+  position: relative;
+  background: color-mix(in srgb, var(--dsw-alias-bg-layer-1) 76%, transparent);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  backdrop-filter: blur(22px) saturate(180%);
+  box-shadow:
+    inset 0 0 0 0.5px color-mix(in srgb, var(--dsw-alias-label-primary) 16%, transparent),
+    inset 0 1px 0 color-mix(in srgb, #fff 20%, transparent),
+    inset 0 -1px 0 color-mix(in srgb, #000 22%, transparent),
+    0 1px 2px rgba(0, 0, 0, .16),
+    0 10px 28px -10px rgba(0, 0, 0, .5);
+}
+/* 斜向镜面高光: 光从左上一道扫过去, 玻璃才有"面" */
+.lg::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit;
+  pointer-events: none; mix-blend-mode: screen;
+  background: linear-gradient(150deg,
+    color-mix(in srgb, #fff 13%, transparent) 0%,
+    transparent 44%, transparent 58%,
+    color-mix(in srgb, #fff 5%, transparent) 100%);
+}
+/* 玻璃里的次级分区(思考/工具返回那种缩进层): 更薄一层, 不抢主线 */
+.lg-sub {
+  background: color-mix(in srgb, var(--dsw-alias-bg-layer-2) 62%, transparent);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  backdrop-filter: blur(14px) saturate(160%);
+  box-shadow:
+    inset 0 0 0 0.5px color-mix(in srgb, var(--dsw-alias-label-primary) 12%, transparent),
+    inset 0 1px 0 color-mix(in srgb, #fff 12%, transparent);
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .lg { background: var(--dsw-alias-bg-layer-1); }
+  .lg-sub { background: var(--dsw-alias-bg-layer-2); }
+}
+/* 左边那道角色色条: 分层靠它一眼看出"这是谁在说话" */
+/* ===== 动效(2026-09-18 老板"动画搞好一点") =====
+   原则: 短(150~220ms)、缓出、只做位移+淡入, 不做花哨旋转; 尊重系统 reduce-motion。
+   折叠面板用 grid-template-rows 0fr→1fr 过渡(比 max-height 平滑, 不会跳)。 */
+@keyframes dsIn { from { opacity: 0; transform: translateY(8px) scale(.995); } 62% { opacity: 1; transform: translateY(-2px); } to { opacity: 1; } }
+@keyframes dsPop { from { opacity: 0; transform: scale(.92); } 60% { opacity: 1; transform: scale(1.025); } to { opacity: 1; } }
+@keyframes dsBlink { 50% { opacity: 0; } }
+/* 2026-09-20 老板「执行工具那些 是左边往右滑出来的 不是直接出来」+「动画 q 弹一点」:
+   from = 左侧 -18px + 微缩, 中段过冲 +4px, 收尾回落 —— 回弹感来自这条过冲。
+   —— 后面老板补一句「为什么是直接展开的 而不是慢慢展开带动画的」:
+   原来这条只动 translateX+scale, **元素高度第一帧就是最终值** →
+   看着就是"唰地占满位置、再横着滑一下", 没有"长出来"的过程。
+   现在把 max-height 也从 0 拉起来: 前 62% 把高度撑开(主体动作), 后段横向归位收尾。
+   (max-height 大于内容高度时, 元素高度照样由内容决定, 所以末帧停在大值没有副作用)
+   2026-09-23 老板「展开的动画不行 动效不够好 还有过渡动画慢点」→ 再调一版:
+   时长 0.46→0.62s, 横向位移收敛(-18→-14px, 过冲 4→2px, 别那么"甩"), max-height 提前到 70% 撑满,
+   缓动换 easeOutQuint 味的 cubic-bezier(.22,.9,.24,1) —— 尾巴更长更顺, 像"长出来"而不是"弹出来"。 */
+/* 2026-09-30 老板「动画不行 我要求和他一样」(对象=RikkaHub) → 整条 max-height 障眼法退役:
+   高度改由 <SpringIn>/<SpringFold> 写**真实值**(src/motion.ts), 这里只管横向位移 + 淡入,
+   缓动换成 M3 Expressive 弹簧(linear() 缓动串由 main.tsx 注入 :root, 不支持则回落 cubic-bezier)。 */
+@keyframes dsSlideIn {
+  0% { opacity: 0; transform: translateX(-10px); }
+  100% { opacity: 1; transform: none; }
+}
+
+.anim-in { animation: dsIn .26s var(--spring-default-spatial, cubic-bezier(.22,1.25,.36,1)) both; }
+.anim-pop { animation: dsPop .34s var(--spring-fast-spatial, cubic-bezier(.22,1.3,.36,1)) both; }
+/* 行进场: 位移/淡入走弹簧; 高度由 <SpringIn> 的 JS 弹簧给(真实 px, 不是猜的数) */
+.anim-step {
+  contain: paint;
+  animation: dsSlideIn var(--spring-spatial-ms, 443ms) var(--spring-default-spatial, cubic-bezier(.2,0,0,1)) both;
+}
+.cursor-blink { animation: dsBlink 1.05s steps(1, end) infinite; }
+
+/* ===== 呼吸动效(2026-09-22 老板「视觉反馈不行 动画不够好 没有呼吸动效」) =====
+   呼吸 = 幅度很小的缩放 + 透明度起伏(1.6~2.2s 一轮, ease-in-out), 只挂在"正在跑"的东西上:
+   它不像旋转那样抢注意力, 但一眼就知道"它活着" —— 之前只有入场动画, 停了之后整屏是死的。
+   三件套:
+     .breathe      通用呼吸(光标/图标)
+     .breathe-bar  竖向拉伸式呼吸(行内左侧那道"正在跑"的强调条)
+     .live-dot     小圆点 + 外圈呼吸光环(状态胶囊里的"在线"点)
+   全部 transform/opacity 动画(合成层, 不触发重排), 手机端不掉帧。 */
+@keyframes dsBreath { 0%, 100% { opacity: .6; transform: scale(.93); } 50% { opacity: 1; transform: scale(1.07); } }
+@keyframes dsBreathBar { 0%, 100% { opacity: .35; transform: scaleY(.5); } 50% { opacity: 1; transform: scaleY(1); } }
+@keyframes dsBreathGlow { 0%, 100% { box-shadow: 0 0 0 0 rgba(77, 107, 254, 0); } 50% { box-shadow: 0 0 0 3px rgba(77, 107, 254, .14); } }
+
+.breathe { animation: dsBreath 1.7s ease-in-out infinite; transform-origin: 50% 50%; will-change: transform, opacity; }
+.breathe-bar { animation: dsBreathBar 1.4s ease-in-out infinite; transform-origin: 50% 50%; }
+.breathe-glow { animation: dsBreathGlow 2.1s ease-in-out infinite; }
+.live-dot {
+  position: relative; display: inline-block; width: 6px; height: 6px; flex: none;
+  border-radius: 999px; background: var(--color-accent);
+}
+.live-dot::after {
+  content: ''; position: absolute; inset: -3px; border-radius: 999px;
+  border: 1px solid var(--color-accent); animation: dsBreath 1.7s ease-in-out infinite;
+}
+/* 正在跑的那一行: 卡片内左侧一道会呼吸的强调条(不碰头像那一列, 见上面"层次感"那段的教训) */
+.run-live { position: relative; }
+.run-live::after {
+  content: ''; position: absolute; left: 1px; top: 8px; bottom: 8px; width: 2.5px;
+  border-radius: 2px; background: var(--color-accent);
+  animation: dsBreathBar 1.4s ease-in-out infinite;
+}
+
+/* 2026-09-23 老板「折叠开有点卡」→ 三个降本动作(卡在**每帧重算布局**和**每帧重算毛玻璃**):
+     ① 时长 .5 → .34s: grid-template-rows 动画是**逐帧算布局**的, 拖得越久越容易掉帧(它天生不可合成)
+     ② .fold-in 加 contain: paint → 把重绘范围锁在这一块里, 别让整页跟着重排/重绘
+     ③ 展开的卡片**关掉毛玻璃**(下面 .glass-row[data-open] 那条): 高度动画期间, 毛玻璃层每帧都要
+        重新模糊一遍背后的内容 —— 之前 blur(22px) 就是"卡"的最大来源。展开态改成实色卡, 更干净也更快。 */
+.fold { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .34s cubic-bezier(.22, .9, .24, 1); }
+.fold[data-open="1"] { grid-template-rows: 1fr; }
+.fold > .fold-in { overflow: hidden; min-height: 0; contain: paint; }
+.fold > .fold-in > * {
+  opacity: 0; transform: translateY(-5px);
+  transition: opacity .24s ease, transform .34s cubic-bezier(.22, .9, .24, 1);
+  transition-delay: var(--d, 0ms);
+}
+.fold[data-open="1"] > .fold-in > * { opacity: 1; transform: none; }
+
+.navi { transition: background-color .2s ease, color .2s ease, transform .16s ease; }
+.navi:active { transform: scale(.985); }
+.btn, button { transition: background-color .2s ease, color .2s ease, opacity .2s ease, transform .16s ease; }
+
+@media (prefers-reduced-motion: reduce) {
+  .anim-in, .anim-pop, .anim-step, .cursor-blink,
+  .breathe, .breathe-bar, .breathe-glow, .live-dot::after, .run-live::after { animation: none !important; }
+  .fold { transition: none; }
+}
+
+/* ===== 卡片 ===== 2026-09-20 老板「没有颜色吗 那些东西」+「怎么又不兼容手机了」:
+   原来是**默认**就 rgba(255,255,255,.5) 半透明白底 + 白边框 —— 手机端 backdrop-filter 一旦不生效,
+   白底白边压在白色页面上, 看着就是一坨"没颜色"。
+   改成**渐进增强**: 默认走 DSH token 实色卡(有层次色 + 可见描边), 只有确认支持模糊时才升级成液态玻璃。 */
+.glass-row {
+  position: relative;
+  border: 1px solid var(--dsw-alias-border-l1);
+  border-radius: 13px;
+  background: var(--dsw-specific-bubble, var(--dsw-alias-bg-layer-2));
+  box-shadow: 0 1px 1.5px rgba(16, 18, 24, .04), 0 8px 18px -14px rgba(16, 18, 24, .26);
+  padding: 3px 8px 3px 6px;
+  transition: background-color .28s ease, border-color .28s ease, box-shadow .28s ease, transform .16s ease;
+}
+/* 动画结束后 transform 归位(to 帧不写 transform), 所以这里的按压缩放是有效的 */
+.glass-row:active { transform: scale(.994); }
+.glass-row:hover { border-color: var(--dsw-alias-border-l2); }
+.glass-row[data-open] { background: var(--dsw-alias-bg-layer-3); }
+.glass-row pre { background: var(--dsw-alias-bg-layer-1); border-color: var(--dsw-alias-border-l1); }
+body[data-ds-dark-theme] .glass-row { border-color: var(--dsw-alias-border-l1); }
+body[data-ds-dark-theme] .glass-row[data-open] { background: var(--dsw-alias-bg-layer-3); }
+/* 展开态那一下"抬起来": 不覆盖阴影(玻璃层的多层阴影会被顶掉), 改用 1px 上浮 + 描边高亮,
+   过渡沿用 .glass-row 的 .28s —— 原来 .18s 太快, 层次变化看不出来。
+   2026-09-23 再加一条: 展开的卡片**切实色**(关毛玻璃) —— 展开时它下面就是正在做高度动画的内容,
+   如果还挂着 blur(22px), 浏览器每帧都要重算一遍模糊 → 折叠"卡"的主因。 */
+.glass-row[data-open] {
+  transform: translateY(-1px); border-color: var(--dsw-alias-border-l2);
+  -webkit-backdrop-filter: none; backdrop-filter: none;
+  background: var(--dsw-alias-bg-layer-2);
+}
+body[data-ds-dark-theme] .glass-row[data-open] { background: var(--dsw-alias-bg-layer-3); }
+
+/* 输入栏同理: 默认实色, 描边明确 */
+.glass-bar {
+  border: 1px solid var(--dsw-alias-border-l2);
+  border-radius: 16px;
+  background: var(--dsw-alias-bg-layer-1);
+  box-shadow: 0 1px 1.5px rgba(16, 18, 24, .05), 0 -4px 20px -18px rgba(16, 18, 24, .4);
+}
+
+/* ===== 液态玻璃(增强层) =====
+   只在浏览器**确实支持** backdrop-filter 时才应用。不写 `@supports not` —— 老 WebView 解不动那句
+   就保持上面的实色卡, 不会退化成"白底白边糊一坨"。支持时才有半透明 + 模糊 + 顶部高光 + 多层阴影。 */
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass-row {
+    border-color: rgba(255, 255, 255, .5);
+    background: linear-gradient(180deg, rgba(255, 255, 255, .52), rgba(255, 255, 255, .26));
+    -webkit-backdrop-filter: blur(22px) saturate(1.8);
+    backdrop-filter: blur(22px) saturate(1.8);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, .78),
+      inset 0 -1px 0 rgba(255, 255, 255, .22),
+      0 1px 1.5px rgba(16, 18, 24, .05),
+      0 10px 24px -14px rgba(16, 18, 24, .38),
+      0 24px 48px -30px rgba(16, 18, 24, .40);
+  }
+  .glass-row::before {
+    content: ''; position: absolute; left: 10%; right: 10%; top: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .9), transparent);
+    pointer-events: none;
+  }
+  .glass-row[data-open] { background: linear-gradient(180deg, rgba(255, 255, 255, .78), rgba(255, 255, 255, .48)); }
+  .glass-row pre { background: rgba(255, 255, 255, .42); }
+  body[data-ds-dark-theme] .glass-row {
+    border-color: rgba(255, 255, 255, .14);
+    background: linear-gradient(180deg, rgba(255, 255, 255, .075), rgba(255, 255, 255, .03));
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, .10),
+      inset 0 -1px 0 rgba(255, 255, 255, .04),
+      0 1px 1.5px rgba(0, 0, 0, .5),
+      0 12px 28px -16px rgba(0, 0, 0, .85),
+      0 28px 56px -34px rgba(0, 0, 0, .9);
+  }
+  body[data-ds-dark-theme] .glass-row::before { background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .28), transparent); }
+  body[data-ds-dark-theme] .glass-row[data-open] { background: linear-gradient(180deg, rgba(255, 255, 255, .12), rgba(255, 255, 255, .055)); }
+  body[data-ds-dark-theme] .glass-row pre { background: rgba(255, 255, 255, .05); }
+  .glass-bar {
+    border-color: rgba(255, 255, 255, .55);
+    background: linear-gradient(180deg, rgba(255, 255, 255, .60), rgba(255, 255, 255, .34));
+    -webkit-backdrop-filter: blur(26px) saturate(1.8);
+    backdrop-filter: blur(26px) saturate(1.8);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, .82),
+      0 1px 1.5px rgba(16, 18, 24, .05),
+      0 -4px 22px -18px rgba(16, 18, 24, .45),
+      0 18px 40px -28px rgba(16, 18, 24, .5);
+  }
+  body[data-ds-dark-theme] .glass-bar {
+    border-color: rgba(255, 255, 255, .14);
+    background: linear-gradient(180deg, rgba(255, 255, 255, .08), rgba(255, 255, 255, .035));
+  }
+}
+
+/* 系统开了「减弱透明」→ 一律回实色 */
+@media (prefers-reduced-transparency: reduce) {
+  .glass-row, .glass-row[data-open], .glass-bar {
+    background: var(--dsw-alias-bg-layer-2);
+    border-color: var(--dsw-alias-border-l1);
+    -webkit-backdrop-filter: none; backdrop-filter: none;
+  }
+}
+
+/* ===== 层次感 ===== 2026-09-20 老板「左边为什么显示空 哪里没有头像遮挡啊」:
+   之前给执行过程区加的左侧引导线(left:-7px)正好画进了**头像那一列** ——
+   在消息气泡里看起来就是「左边一条竖线 + 线外侧一片空白」, 像多了个空槽。
+   层次改由卡片自身的描边 + 阴影 + 卡中卡的凹陷承担, 这里**不再画任何线、不做任何缩进**。
+   ② 卡中卡: 卡片里的输出/代码块凹进去一层, 和外层卡片拉开前后关系。 */
+.glass-row pre { box-shadow: inset 0 1px 2px rgba(16, 18, 24, .07); }
+body[data-ds-dark-theme] .glass-row pre { box-shadow: inset 0 1px 2px rgba(0, 0, 0, .35); }
+
+/* ===== 层次感(2026-09-20 老板「层次感加回来」) =====
+   上一版用左侧引导线做, 线画进了头像那一列被判「左边空」。这次**完全不碰左侧**, 靠三样东西分层:
+   ① 色阶: 思考行(每轮的外层)比工具行(内层)深一档, 一眼看出谁包着谁
+   ② 卡中卡: 卡片里的输出/代码块凹进去一层(上面那条 inset 阴影)
+   ③ 垂直分组: 同一轮内 4px、轮与轮之间 10px(见 Steps 里的 mb-2.5) */
+.glass-think { background: var(--dsw-alias-bg-layer-2); }
+.glass-tool { background: var(--dsw-alias-bg-layer-1); }
+body[data-ds-dark-theme] .glass-think { background: var(--dsw-alias-bg-layer-3); }
+body[data-ds-dark-theme] .glass-tool { background: var(--dsw-alias-bg-layer-2); }
+
+/* 播报行(🗣 他在干什么) —— 2026-09-20 老板「播报过程怎么在思考里面」:
+   从"思考"行里拆出来单独一条, 给一层极淡的强调色, 和工具行/思考行一眼分得开。
+   色值是固定 rgba(不用 color-mix), 老 WebView 也认。 */
+
+/* ===== 降噪(2026-09-23 老板「这样显示我感觉 有点乱」) =====
+   问题: 过程区里**每一行都是一张一样重的玻璃卡** —— 状态、播报、工具、错误 全是同宽的亮条,
+   一屏十几条堆下来看不出谁包着谁、也看不出轮次边界。三招分级:
+     ① .tool-slim  跑完的工具行**不再是卡片**: 透明无框, hover 才浮起来(点开才变回卡片)
+     ② 播报行     不再是卡片: 只留左侧一道 2px 强调色竖条 + 正常字号正文(读起来像"他说了一句")
+     ③ .round-head 每轮一条极淡的分组头(第 N 轮 · 工具数 · 耗时 + 一条细线), 把轮次切开
+   注意选择器带 .glass-row 前缀: 否则干不过文件后面 @supports 里那坨玻璃样式(同权重取后者)。 */
+.glass-row.tool-slim,
+.glass-row.tool-slim:hover {
+  border-color: transparent; background: transparent; box-shadow: none;
+  padding: 1px 8px 1px 5px; border-radius: 9px;
+}
+.glass-row.tool-slim:hover { background: var(--dsw-alias-bg-layer-2); }
+.glass-row.tool-slim::before { display: none; }
+body[data-ds-dark-theme] .glass-row.tool-slim,
+body[data-ds-dark-theme] .glass-row.tool-slim:hover {
+  border-color: transparent; background: transparent; box-shadow: none;
+}
+body[data-ds-dark-theme] .glass-row.tool-slim:hover { background: var(--dsw-alias-bg-layer-2); }
+
+.glass-row.glass-note {
+  border-color: transparent; background: transparent; box-shadow: none;
+  border-left: 2px solid var(--color-accent); border-radius: 2px 9px 9px 2px;
+  padding: 2px 8px 2px 8px;
+}
+.glass-row.glass-note::before { display: none; }
+body[data-ds-dark-theme] .glass-row.glass-note { border-color: transparent; border-left-color: var(--color-accent); background: transparent; }
+
+.round-head {
+  display: flex; align-items: center; gap: 6px;
+  margin: 9px 0 3px; padding-left: 2px;
+  font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .02em;
+  /* ★2026-10-05 老板「跟透明一样」: 原来是 label-caption(最淡一档), 在容器框里几乎看不见。
+     提到 tertiary, 分组头"第 N 轮 · 工具数 · 耗时"才读得出来。 */
+  color: var(--dsw-alias-label-tertiary);
+}
+.round-head::after { content: ''; flex: 1; height: 1px; background: var(--dsw-alias-border-l1); }
+
+.glass-note {
+  background: rgba(59, 130, 246, .07);
+  border-color: rgba(59, 130, 246, .18);
+  color: var(--dsw-alias-label-primary, inherit);
+}
+body[data-ds-dark-theme] .glass-note {
+  background: rgba(59, 130, 246, .14);
+  border-color: rgba(59, 130, 246, .28);
+}
+/* 播报行的正文 —— 2026-09-20 老板「文字太小了 而且没有富文本」:
+   走 <Markdown> 编排(加粗/代码/列表/emoji 都认), 字号 15px 比正文的 13.5px 大一档,
+   一眼就能和"思考行/工具行"分开: 这是SPECTRE在跟主人说话。 */
+.glass-note .md,
+.glass-note .tw { font-size: 15px; line-height: 1.6; font-weight: 500; }
+.glass-note .md > :first-child { margin-top: 0; }
+.glass-note .md > :last-child { margin-bottom: 0; }
+.glass-note .md p { margin: 0 0 .3em; }
+.glass-note .md ul, .glass-note .md ol { margin: .25em 0 .35em; }
+.glass-note .md code { font-size: 13px; }
+.glass-note .md h1, .glass-note .md h2, .glass-note .md h3, .glass-note .md h4 { font-size: 15.5px; margin: .3em 0 .2em; }
+
+/* 工具行折叠态的摘要文字(替代原来直接甩命令原文) */
+.arg-hint { font-size: 11.5px; color: var(--dsw-alias-label-tertiary); }
+
+/* 布局用: 让 flex 子项能正常收缩(长命令/路径不撑破) */
+.minw0 { min-width: 0; }
+/* 消息区滚动: 阻止滚动穿透到外层/页面(手机上"滑到底又弹回去"多半是它) */
+.chatscroll { overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
+  /* ★2026-10-05 老板手机截图「显示不对劲」: 滚动到中途时，最上面那条消息被切掉半行字，
+     看着像页面坏了(其实是正常滚动位置)。顶部加一道 18px 渐隐，半截的行就"淡出去"而不是硬切。 */
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 18px);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 18px); }
+
+/* ===== markdown 富文本(老板反馈"富文本乱") —— 尺寸/颜色全走 DSH token ===== */
+.md { font-size: 13.5px; line-height: 1.62; overflow-wrap: anywhere; }
+.md > :first-child { margin-top: 0; }
+.md > :last-child { margin-bottom: 0; }
+.md p { margin: 0 0 .5em; }
+.md h1, .md h2, .md h3, .md h4 { margin: .75em 0 .35em; font-weight: 600; line-height: 1.35; }
+.md h1 { font-size: 18px; }
+.md h2 { font-size: 16px; }
+.md h3 { font-size: 14.5px; }
+.md h4 { font-size: 13.5px; }
+.md ul, .md ol { margin: .35em 0 .6em; padding-left: 1.35em; }
+.md ul { list-style: disc; }
+.md ol { list-style: decimal; }
+.md li { margin: .15em 0; }
+.md li > p { margin: 0; }
+.md code { font-family: var(--font-mono); font-size: 12px; padding: 1px 5px; border-radius: 6px;
+  background: var(--dsw-alias-markdown-inline-code, var(--dsw-static-neutral-50));
+  border: 1px solid var(--dsw-alias-border-l1); }
+.md pre { margin: .5em 0; padding: 9px 11px; border-radius: 10px; overflow-x: auto;
+  background: var(--dsw-alias-markdown-code-block, var(--dsw-static-neutral-50));
+  border: 1px solid var(--dsw-alias-border-l1); }
+.md pre code { background: none; border: 0; padding: 0; font-size: 12px; line-height: 1.55; white-space: pre; }
+.md blockquote { margin: .5em 0; padding: .15em .8em; border-left: 3px solid var(--dsw-alias-border-l3);
+  color: var(--dsw-alias-label-secondary); }
+.md a { color: var(--dsw-alias-link); text-decoration: underline; text-underline-offset: 2px; }
+.md table { display: block; width: max-content; max-width: 100%; overflow-x: auto; border-collapse: collapse;
+  margin: .5em 0; font-size: 12.5px; }
+.md th, .md td { border: 1px solid var(--dsw-alias-border-l1); padding: 4px 8px; text-align: left; white-space: nowrap; }
+.md th { background: var(--dsw-alias-bg-layer-2); font-weight: 600; }
+.md hr { border: 0; border-top: 1px solid var(--dsw-alias-border-l1); margin: .8em 0; }
+.md img { max-width: 100%; border-radius: 8px; }
+.md strong { font-weight: 600; }
+
+/* ===== 窄屏(手机)加固 —— 2026-09-20 老板「适配一下手机端」 ===== */
+@media (max-width: 640px) {
+  /* iOS 一聚焦就把整页放大 —— 根因就是输入框字号 < 16px, 必须给到 16 */
+  .glass-bar textarea, .glass-bar input { font-size: 16px; }
+  /* 手机上把模糊半径压小: 大半径 backdrop-filter 在低端 WebView 上会掉帧 */
+  .glass-row { -webkit-backdrop-filter: blur(10px) saturate(1.5); backdrop-filter: blur(10px) saturate(1.5); }
+  .glass-bar { -webkit-backdrop-filter: blur(12px) saturate(1.5); backdrop-filter: blur(12px) saturate(1.5); }
+  /* 卡片收一档内边距 + 小一号圆角: 手机屏宽就这么点, 每边省 1px 都是内容 */
+  .glass-row { padding: 3px 7px 3px 5px; border-radius: 12px; }
+  .glass-bar { border-radius: 14px; padding: 5px; }
+  /* 行高固定 24px 在手机上偏紧, 给工具/思考行的标题留出呼吸 */
+  .glass-row { min-height: 0; }
+}
+
+
+/* ===== 2026-09-30 弹簧进场/折叠(RikkaHub 同款, 见 src/motion.ts) ===== */
+.springin {
+  will-change: height, transform, opacity;
+  contain: paint;                 /* 高度逐帧变 -> 把重绘锁在行内 */
+}
+.springin > div { transform: translateZ(0); }
+/* 等价 Compose 的 Modifier.animateContentSize(): 内容变长时容器高度走弹簧(首帧不播) */
+.springgrow {
+  will-change: height, opacity;
+  contain: paint;
+}
+.springgrow > div { transform: translateZ(0); }
+/* 展开面板: JS 逐帧写高度(等价 Compose animateContentSize), 这里只声明合成提示 */
+.springfold { will-change: height; contain: paint; }
+@media (prefers-reduced-motion: reduce) {
+  .anim-in, .anim-pop, .anim-step { animation: none !important; }
+}
+
+
+/* ===== 每一条执行都圈起来(2026-10-07 老板「里面的都不明显 搞个气泡圈他啊 每一个执行啊 其他的」) =====
+   他说的是对话流里的过程区: 轮次分隔头 + 每一条跑完的工具行。
+   病根在上一组「降噪」: .tool-slim 被做成**透明无框**(border/background 全 transparent),
+   .round-head 只有一行 tertiary 小字 + 一条 hairline 细线 —— 暗色主题 + 高分屏下等于没有。
+   现在全部换成气泡: 每条工具行在自己的圆角底上, 轮次头是一颗胶囊。
+   ⚠️ 这块必须留在文件最后 —— 上面 @supports 里那坨玻璃样式跟它同权重, 靠"后者胜"才压得住。 */
+
+/* ① 轮次头 → 胶囊。那条 ::after 细线直接废掉, 它才是"看不见"的主因 */
+.round-head {
+  display: inline-flex; align-items: center; gap: 6px;
+  margin: 10px 0 5px; padding: 2.5px 10px 2.5px 9px;
+  border-radius: 999px; font-weight: 600; letter-spacing: .01em;
+  color: var(--dsw-alias-label-secondary);
+  background: color-mix(in srgb,
+    var(--dsw-alias-brand-primary-new-colorprimary-new-color, #4d6bfe) 15%,
+    var(--dsw-alias-bg-layer-2) 85%);
+  box-shadow:
+    inset 0 0 0 .5px color-mix(in srgb, var(--dsw-alias-label-primary) 18%, transparent),
+    inset 0 1px 0 color-mix(in srgb, #fff 15%, transparent),
+    0 1px 3px rgba(0, 0, 0, .18);
+}
+.round-head::after { display: none; }
+
+/* ② 跑完的工具行 → 淡气泡(原来 border/bg 全 transparent) */
+.glass-row.tool-slim,
+.glass-row.tool-slim:hover,
+body[data-ds-dark-theme] .glass-row.tool-slim,
+body[data-ds-dark-theme] .glass-row.tool-slim:hover {
+  border-color: color-mix(in srgb, var(--dsw-alias-label-primary) 13%, transparent);
+  background: color-mix(in srgb, var(--dsw-alias-bg-layer-2) 72%, transparent);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 8%, transparent);
+  padding: 2px 9px 2px 7px; border-radius: 10px;
+}
+.glass-row.tool-slim:hover,
+body[data-ds-dark-theme] .glass-row.tool-slim:hover {
+  background: var(--dsw-alias-bg-layer-3);
+  border-color: color-mix(in srgb, var(--dsw-alias-label-primary) 24%, transparent);
+}
+/* 气泡里那两处 text-fg4(工具名后缀 / 耗时)太淡, 在气泡底上提一档。
+   选择器比单个 .text-fg4 具体, 赢。 */
+.glass-row.glass-tool .text-fg4 { color: var(--dsw-alias-label-tertiary); }
+
+/* ③ 播报行(glass-note) → 也圈起来, 保留左侧那道强调竖条当身份 */
+.glass-row.glass-note,
+body[data-ds-dark-theme] .glass-row.glass-note {
+  background: color-mix(in srgb, var(--dsw-alias-bg-layer-2) 58%, transparent);
+  border-color: color-mix(in srgb, var(--dsw-alias-label-primary) 10%, transparent);
+  border-left: 2.5px solid var(--color-accent);
+  border-radius: 3px 10px 10px 3px;
+  padding: 3px 9px;
+}
+
+/* ④ 过程区外框上玻璃, 和里面每颗气泡拉开层次。
+   JSX 上挂的是 Tailwind 的 border/bg-muted/50, 同权重下 utility 会赢 —— 所以带 !important。 */
+.steps {
+  background: color-mix(in srgb, var(--dsw-alias-bg-layer-1) 55%, transparent) !important;
+  border-color: color-mix(in srgb, var(--dsw-alias-label-primary) 13%, transparent) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(170%);
+  backdrop-filter: blur(16px) saturate(170%);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, #fff 10%, transparent),
+    0 6px 20px -12px rgba(0, 0, 0, .5);
+}
+
+/* 左边那道角色色条(子代理页 agent.tsx 用): 颜色的值由 Tailwind 的 border-l-* 给, 这里只定宽度 */
+.lg-bar { border-left-width: 3px; border-left-style: solid; }

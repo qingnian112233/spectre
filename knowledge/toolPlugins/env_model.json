@@ -1,0 +1,26 @@
+{
+ "name": "env_model",
+ "description": "环境建模层(L4自主红队轴承①): 打之前/打之中给目标建'世界模型'——自动探测并记录 WAF敏感性token表(哪些拦截/放行)/基线延迟与抖动(时间盲注可用性)/指纹/端口/攻击面, 持久化跨会话复用。杜绝'打一步试一步'。op=probe建模型 / merge合并侦察结果 / get读模型 / wafmap查WAF放行拦截字典 / list列已建模目标 / forget删除。触发词: 环境建模/目标画像/WAF画像/建世界模型",
+ "schema": {
+  "type": "object",
+  "properties": {
+   "op": {"type": "string", "enum": ["probe", "merge", "get", "wafmap", "list", "forget"], "description": "probe=探测建模型 / merge=合并侦察结果 / get=读模型 / wafmap=WAF放行拦截字典 / list=列出 / forget=删除"},
+   "target": {"type": "string", "description": "目标host或域名"},
+   "path": {"type": "string", "description": "探测路径,默认/"},
+   "param": {"type": "string", "description": "探测参数名,默认q"},
+   "method": {"type": "string", "description": "GET/POST,默认GET"},
+   "timeout": {"type": "integer", "description": "超时秒,默认20"},
+   "fingerprint": {"type": "object", "description": "merge: 指纹信息"},
+   "ports": {"type": "object", "description": "merge: 端口信息"},
+   "surface": {"type": "array", "description": "merge: 攻击面列表", "items": {"type": "string"}},
+   "tech_vectors": {"type": "array", "description": "merge: 技术向量", "items": {"type": "string"}},
+   "bypass": {"type": "array", "description": "merge: 已验证绕过手法", "items": {"type": "string"}},
+   "notes": {"type": "array", "description": "merge: 备注", "items": {"type": "string"}},
+   "echo_shape": {"type": "string", "description": "merge: 回显形态描述"}
+  },
+  "required": ["op", "target"]
+ },
+ "exec": "/opt/deepseek-bot/knowledge/toolPlugins/env_model.py",
+ "admin_only": true,
+ "timeout": 180
+}

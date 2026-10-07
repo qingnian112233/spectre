@@ -1,0 +1,24 @@
+{
+ "name": "mcp_bridge",
+ "description": "MCP客户端桥: 接入任意 Model Context Protocol server(stdio), 列出/调用其工具, 并可把MCP工具自动注册成本地插件。op=add注册server/list列出/tools看工具/call调用/sync一键把MCP工具变本地插件/start拉起/stop停/raw直接打JSON-RPC",
+ "schema": {
+  "type": "object",
+  "properties": {
+   "op": {"type": "string", "enum": ["add", "remove", "list", "start", "stop", "tools", "call", "sync", "raw"], "description": "add=注册server / list=列出 / tools=列工具 / call=调用工具 / sync=自动注册为本地插件 / start=拉起 / stop=停 / raw=直接JSON-RPC"},
+   "server": {"type": "string", "description": "server 名"},
+   "name": {"type": "string", "description": "add 时的 server 名"},
+   "command": {"type": "string", "description": "启动命令, 默认 npx"},
+   "args": {"type": "array", "items": {"type": "string"}, "description": "命令参数, 如 [\"-y\",\"@modelcontextprotocol/server-filesystem\",\"/tmp\"]"},
+   "env": {"type": "object", "description": "附加环境变量"},
+   "tool": {"type": "string", "description": "call 时的工具名"},
+   "arguments": {"type": "object", "description": "call 时的工具参数"},
+   "method": {"type": "string", "description": "raw 时的 JSON-RPC 方法"},
+   "params": {"type": "object", "description": "raw/notify 参数"},
+   "timeout": {"type": "integer", "description": "调用超时秒"}
+  },
+  "required": ["op"]
+ },
+ "exec": "/opt/deepseek-bot/knowledge/toolPlugins/mcp_bridge.py",
+ "admin_only": true,
+ "timeout": 300
+}

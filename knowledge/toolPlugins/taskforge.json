@@ -1,0 +1,19 @@
+{
+  "name": "taskforge",
+  "description": "自主任务锻造台(TaskForge): 给一个大目标就能拆成 recon->ports->web->vuln->report 五阶段自主推进并跨会话持久化。goal存目标/plan拆流水线/track记进度/status查锻造台全貌。主人说继续先看status续跑。用法 taskforge op=goal|plan|track|status",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "op": {"type": "string", "enum": ["goal", "plan", "track", "status"], "description": "goal=存大目标 / plan=拆流水线 / track=记录某阶段进度 / status=汇总全貌"},
+      "goal": {"type": "string", "description": "大目标描述"},
+      "project_id": {"type": "string", "description": "目标/项目标识,默认default"},
+      "phase": {"type": "string", "enum": ["recon", "ports", "web", "vuln", "report"], "description": "track时指定阶段"},
+      "state": {"type": "string", "enum": ["planned", "running", "done", "blocked"], "description": "track时指定该阶段状态"},
+      "note": {"type": "string", "description": "进度备注"}
+    },
+    "required": ["op"]
+  },
+  "exec": "/opt/deepseek-bot/knowledge/toolPlugins/taskforge.py",
+  "admin_only": true,
+  "timeout": 15
+}

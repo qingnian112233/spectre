@@ -1,0 +1,50 @@
+{
+ "name": "cdn_trace",
+ "description": "CDN/WAF溯源工具链(前端). tool=tracer|ranges|monitor|annex|quick. tracer:全流程14阶段找源站真实IP(domain,no_verify,no_fingerprint); ranges:查单IP是否CDN或批量过滤(ip/filter); monitor:源站漂移持续监控(domain,interval秒); annex:asn-scan邻段扫描/cert-sha签发关联挖源站; quick:shell快打. 触发:CDN溯源/找源站/真实IP/origin bypass",
+ "schema": {
+  "type": "object",
+  "properties": {
+   "tool": {
+    "type": "string",
+    "enum": [
+     "tracer",
+     "ranges",
+     "monitor",
+     "annex",
+     "quick"
+    ]
+   },
+   "domain": {
+    "type": "string",
+    "description": "目标域名/主机"
+   },
+   "ip": {
+    "type": "string",
+    "description": "ranges单IP查询"
+   },
+   "filter": {
+    "description": "ranges批量过滤的IP列表(list[str])"
+   },
+   "no_verify": {
+    "type": "boolean"
+   },
+   "no_fingerprint": {
+    "type": "boolean"
+   },
+   "interval": {
+    "type": "integer",
+    "description": "monitor监控间隔秒"
+   },
+   "action": {
+    "type": "string",
+    "description": "annex子动作: asn-scan|cert-sha|tls-diff"
+   }
+  },
+  "required": [
+   "tool"
+  ]
+ },
+ "exec": "/opt/deepseek-bot/knowledge/toolPlugins/cdn_trace.py",
+ "admin_only": true,
+ "timeout": 200
+}

@@ -1,0 +1,61 @@
+{
+ "name": "fuzz",
+ "description": "目录/文件/接口/登录页/子域 爆破(ffuf 封装)。**字典路径已内置, 不要自己在 sh 里拼 ffuf -w**; mode 枚举: dir=通用目录3万词 / small=小快2万 / common=4.7千秒出 / big=1千极速 / file=文件名 / api=接口路径 / login=登录页 / sub=子域5000。示例: {\"target\":\"http://1.2.3.4:8080\",\"mode\":\"dir\",\"ext\":\"php\"}。结果只回命中(状态码+长度+路径), 大字典自动截前60条。",
+ "schema": {
+  "type": "object",
+  "properties": {
+   "target": {
+    "type": "string",
+    "description": "目标 URL(如 http://1.2.3.4:8080) 或域名(子域枚举用)"
+   },
+   "mode": {
+    "type": "string",
+    "enum": [
+     "dir",
+     "small",
+     "common",
+     "big",
+     "file",
+     "api",
+     "login",
+     "sub"
+    ],
+    "description": "字典/任务类型, 默认 dir"
+   },
+   "ext": {
+    "type": "string",
+    "description": "额外扩展名, 如 php,html,jsp(逗号分隔)"
+   },
+   "threads": {
+    "type": "number",
+    "description": "并发, 默认 40, 上限 200"
+   },
+   "rate": {
+    "type": "number",
+    "description": "每秒请求上限(0=不限)"
+   },
+   "match_code": {
+    "type": "string",
+    "description": "要匹配的 HTTP 状态码, 默认 200,204,301,302,307,401,403,405,500"
+   },
+   "timeout": {
+    "type": "number",
+    "description": "总超时秒数, 默认 600, 上限 1800"
+   },
+   "no_ac": {
+    "type": "boolean",
+    "description": "true=关掉自动校准(-ac)。默认开; 只在'命中0但你确信站点有东西'时用"
+   },
+   "extra": {
+    "type": "string",
+    "description": "额外 ffuf 参数(谨慎)"
+   }
+  },
+  "required": [
+   "target"
+  ]
+ },
+ "exec": "/opt/deepseek-bot/knowledge/toolPlugins/fuzz.py",
+ "admin_only": true,
+ "timeout": 1800
+}

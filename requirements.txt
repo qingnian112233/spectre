@@ -1,0 +1,28 @@
+# ==== 必需 ====
+telethon>=1.44.0
+httpx>=0.27
+requests>=2.31
+python-dotenv>=1.0
+Pillow>=10.0
+beautifulsoup4>=4.12
+lxml>=5.0
+trafilatura>=2.0
+ddgs>=9.0
+googlesearch-python>=1.2
+pypdf>=4.0
+reportlab>=4.0
+cryptography>=42.0
+
+# ==== API服务/支付(可选) ====
+fastapi>=0.110
+uvicorn>=0.29
+
+# ==== 可选能力(装了才有对应功能) ====
+# faster-whisper>=1.0      # 本地语音识别
+# edge-tts>=7.0            # 语音合成
+# capmonster_python>=1.2   # CapMonster 打码(需自备 key)
+# ddddocr>=1.5             # 本地验证码识别
+# paddleocr>=2.7           # 本地 OCR(占用较大)
+# jieba>=0.42              # 中文分词(RAG 检索用)
+# websocket-client>=1.7    # WebSocket 客户端
+# googlesearch-python      # 已含在主依赖(Google 搜索通道)

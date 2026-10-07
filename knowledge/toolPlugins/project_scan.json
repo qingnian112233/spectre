@@ -1,0 +1,16 @@
+{
+ "name": "project_scan",
+ "description": "项目文件树感知: 自动识别项目根(git/manifest)、技术栈语言占比、入口文件、依赖清单(scripts/框架/包)、目录树、README, 输出可直接注入上下文的紧凑摘要。进入新项目/问'这项目是啥/结构怎样/怎么跑'时先调它",
+ "schema": {
+  "type": "object",
+  "properties": {
+   "op": {"type": "string", "enum": ["context", "scan", "tree", "manifests"], "description": "context=紧凑摘要(默认) / scan=全量JSON / tree=只目录树 / manifests=只看清单文件"},
+   "path": {"type": "string", "description": "起点路径, 默认当前目录"},
+   "depth": {"type": "integer", "description": "目录树层数, 默认3"}
+  },
+  "required": []
+ },
+ "exec": "/opt/deepseek-bot/knowledge/toolPlugins/project_scan.py",
+ "admin_only": true,
+ "timeout": 120
+}

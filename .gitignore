@@ -1,0 +1,37 @@
+# 运行期数据: 一律不进仓库
+.env
+*.session
+*.session-journal
+sessions/
+data.db
+*.db
+*.db-journal
+history.json
+miniapp_chats.json
+memories/
+group_memories/
+projects/
+search_index/
+delivery/
+hb_switch.json
+*_switch.json
+*_cache.json
+logs/
+*.log
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+# 前端
+node_modules/
+.vite/
+# 杂物
+.DS_Store
+Thumbs.db
+*.bak
+*.zip
+*.tsbuildinfo
+npm-debug.log*
+.idea/
+.vscode/

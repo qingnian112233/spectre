@@ -1,0 +1,45 @@
+{
+ "name": "obscura_render",
+ "description": "用本机Obscura无头浏览器(Rust,V8引擎,支持stealth反检测)渲染抓取网页,能拿JS动态渲染页/SPA/掏HttpOnly cookie/截图。url必填。action: text|html|markdown|links|cookies|original|assets|screenshot;eval可选传JS表达式。比url工具强在能渲染JS+反检测。",
+ "schema": {
+  "type": "object",
+  "properties": {
+   "url": {
+    "type": "string",
+    "description": "要渲染抓取的目标URL"
+   },
+   "action": {
+    "type": "string",
+    "enum": [
+     "text",
+     "html",
+     "markdown",
+     "links",
+     "cookies",
+     "original",
+     "assets",
+     "screenshot"
+    ],
+    "description": "抓取类型,默认text"
+   },
+   "eval": {
+    "type": "string",
+    "description": "可选JS表达式,如 document.title"
+   },
+   "out": {
+    "type": "string",
+    "description": "screenshot模式截图输出路径(默认/tmp/obscura_render.png)"
+   },
+   "timeout": {
+    "type": "integer",
+    "description": "超时秒,默认90"
+   }
+  },
+  "required": [
+   "url"
+  ]
+ },
+ "exec": "/opt/deepseek-bot/knowledge/toolPlugins/obscura_render.py",
+ "timeout": 120,
+ "admin_only": true
+}

@@ -1,0 +1,16 @@
+{
+  "name": "preflight",
+  "description": "开工前技能体检(抄 dsh-redteam-mode 的 skill-availability):技能能列出来≠能跑,缺KEY/缺工具/VPS占位符要等动手才发现就晚了。一次性体检:①26个渗透工具是否在PATH ②必需环境变量(FOFA_KEY/DSH_HOME) ③知识库关键文件与目录 ④指定技能(skill参数)正文里引用的变量/路径/占位符是否齐全。输出每项 available/broken + 缺什么 + 降级方案。渗透/红队任务开工第一步调它。",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "skill": {
+        "type": "string",
+        "description": "可选:指定技能名(如 xxe-test / ssrf-test / fofa-recon),额外判定该技能正文里的必需变量、缺失路径、未填占位符"
+      }
+    }
+  },
+  "exec": "/opt/deepseek-bot/knowledge/toolPlugins/preflight.py",
+  "admin_only": true,
+  "timeout": 60
+}

@@ -1,0 +1,16 @@
+{
+ "name": "dynamic_plan",
+ "description": "动态规划层(L4自主红队轴承②): 攻击DAG随侦察结果'自重构'——读env_model世界模型生成初始DAG, 喂入新情报(某技术失败/发现新攻击面/WAF拦某token)后自动剪枝死路+插入新向量+调优先级, 输出下一步该打哪个。堵了自动换轴, 不是一次建死。op=seed建初始DAG / replan喂情报重规划 / next挑下一步 / tree看全貌 / reset清空。触发词: 动态规划/攻击链重规划/换轴/DAG重构",
+ "schema": {
+  "type": "object",
+  "properties": {
+   "op": {"type": "string", "enum": ["seed", "replan", "next", "tree", "reset"], "description": "seed=建初始DAG / replan=喂情报重规划 / next=挑下一步 / tree=看DAG / reset=清空"},
+   "target": {"type": "string", "description": "目标host或域名"},
+   "intel": {"type": "object", "description": "replan时的新情报: {failedTech:[{id,reason}], newSurface:[{id,desc,technique,priority,dependsOn}], waf:{block_tokens,bypass}}"}
+  },
+  "required": ["op", "target"]
+ },
+ "exec": "/opt/deepseek-bot/knowledge/toolPlugins/dynamic_plan.py",
+ "admin_only": true,
+ "timeout": 30
+}

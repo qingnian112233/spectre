@@ -1,0 +1,201 @@
+{
+  "name": "factdb",
+  "description": "本鱼红队事实库(抄 dsh-redteam-mode):把每一次侦察/漏洞/凭据/步骤/成果落进本机 SQLite,跨会话与子代理共享,报告直接从库里回放。op=init建靶标工作区 / asset_add落资产(同名同端口自动合并) / asset_test回写测试状态(防重复打) / asset_query查(含sort=todo取未评估) / asset_get / asset_stats盘点 / vuln_add落漏洞 / vuln_query查漏洞(打之前先查,禁止重复验) / step_add落攻击步骤 / credential_add+credential_list凭据 / session_add+归sessions隧道() / finding_add落得分成果(自动套G1取高只计一次+规则上限,旧code自动改派) / score算总分 / score_rules查得分点与通用规则G1-G8 / recon复现链(每条成果对命令与回显,缺命令标'复现链不完整') / stats总览 / sql只读查询。渗透任务第一步就该 init+查库。",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "op": {
+        "type": "string",
+        "description": "init|asset_add|asset_test|asset_query|asset_get|asset_stats|vuln_add|vuln_query|step_add|credential_add|credential_list|session_add|sessions|finding_add|score|score_rules|recon|stats|sql"
+      },
+      "eng": {
+        "type": "string",
+        "description": "靶标工作区ID(单位名/域名)"
+      },
+      "target": {
+        "type": "string",
+        "description": "目标(带端口更准,如 http://h:8080/admin 或 10.0.0.5:6379)"
+      },
+      "scope": {
+        "type": "string",
+        "description": "授权范围(网段/域名)"
+      },
+      "notes": {
+        "type": "string"
+      },
+      "ip": {
+        "type": "string"
+      },
+      "port": {
+        "type": "integer"
+      },
+      "service": {
+        "type": "string"
+      },
+      "product": {
+        "type": "string"
+      },
+      "version": {
+        "type": "string"
+      },
+      "url": {
+        "type": "string"
+      },
+      "title": {
+        "type": "string"
+      },
+      "names": {
+        "type": "string",
+        "description": "域名等,逗号分隔"
+      },
+      "fingerprint": {
+        "type": "string"
+      },
+      "priority": {
+        "type": "string",
+        "description": "high|medium|low"
+      },
+      "potential": {
+        "type": "string",
+        "description": "预期成果对应的得分点code"
+      },
+      "assess_reason": {
+        "type": "string"
+      },
+      "state": {
+        "type": "string"
+      },
+      "test_status": {
+        "type": "string",
+        "description": "untested|testing|tested|blocked|abandoned|no_surface"
+      },
+      "test": {
+        "type": "string",
+        "description": "asset_test 追加式测试记录"
+      },
+      "surface": {
+        "type": "string",
+        "description": "疑似攻击面,交给漏洞发现角色"
+      },
+      "blocked_count": {
+        "type": "integer"
+      },
+      "provenance": {
+        "type": "string",
+        "description": "passive|active"
+      },
+      "tool": {
+        "type": "string"
+      },
+      "agent": {
+        "type": "string",
+        "description": "记录者角色 recon|assess|vuln-scan|exploit|internal"
+      },
+      "asset_id": {
+        "type": "integer"
+      },
+      "status": {
+        "type": "string"
+      },
+      "limit": {
+        "type": "integer"
+      },
+      "sort": {
+        "type": "string",
+        "description": "todo=只取未评估"
+      },
+      "name": {
+        "type": "string",
+        "description": "vuln_add 的漏洞名"
+      },
+      "cve": {
+        "type": "string"
+      },
+      "component": {
+        "type": "string"
+      },
+      "versions": {
+        "type": "string"
+      },
+      "severity": {
+        "type": "string"
+      },
+      "evidence": {
+        "type": "string",
+        "description": "只写结果:目标资产+拿到的东西,数据类必须写实际导出量"
+      },
+      "poc": {
+        "type": "string"
+      },
+      "command": {
+        "type": "string",
+        "description": "实际执行的命令原文"
+      },
+      "output": {
+        "type": "string",
+        "description": "命令回显"
+      },
+      "result": {
+        "type": "string"
+      },
+      "kind": {
+        "type": "string",
+        "description": "credential_add:password|key|token / session_add:tunnel|webshell|session"
+      },
+      "username": {
+        "type": "string"
+      },
+      "secret": {
+        "type": "string"
+      },
+      "source": {
+        "type": "string"
+      },
+      "entry_kind": {
+        "type": "string",
+        "description": "target-outbound|target-http|target-agent|self-only(只在自己VPS上不算突破)"
+      },
+      "entry": {
+        "type": "string",
+        "description": "隧道落地地址"
+      },
+      "stage": {
+        "type": "string"
+      },
+      "point_code": {
+        "type": "string",
+        "description": "得分点code,见 score_rules"
+      },
+      "points": {
+        "type": "integer",
+        "description": "本档分值(多档条目必须指定)"
+      },
+      "confirm": {
+        "type": "string",
+        "description": "pending|confirmed"
+      },
+      "q": {
+        "type": "string",
+        "description": "op=sql 时的只读查询"
+      },
+      "headers": {
+        "type": "string",
+        "description": "replay: 额外请求头, | 分隔, 如 'X-Token: abc|Referer: http://x'"
+      },
+      "cookie": {
+        "type": "string",
+        "description": "replay: Cookie 原文"
+      },
+      "data": {
+        "type": "string",
+        "description": "replay: 请求体"
+      }
+    },
+    "required": [
+      "op"
+    ]
+  },
+  "exec": "/opt/deepseek-bot/knowledge/toolPlugins/factdb.py",
+  "admin_only": true,
+  "timeout": 60
+}

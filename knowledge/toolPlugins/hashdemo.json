@@ -1,0 +1,1 @@
+{"name": "hashdemo", "description": "示例插件: 计算文本的sha256哈希(演示bot自装工具链路)", "schema": {"type": "object", "properties": {"text": {"type": "string", "description": "要哈希的文本"}}, "required": ["text"]}, "exec": "/opt/deepseek-bot/knowledge/toolPlugins/hashdemo.py", "admin_only": true, "timeout": 30}

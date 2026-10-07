@@ -1,0 +1,20 @@
+{
+ "name": "shell_session",
+ "description": "持久交互终端(tmux后端): 保持工作目录/环境变量的常驻shell会话, 可发命令+截屏返回。适合跑交互式工具(ssh/sudo/sqlmap/msfconsole/REPL)、命令跑一半回头看输出。op=new建会话/send发命令并回显/capture只看当前屏/kill关掉/list列出",
+ "schema": {
+  "type": "object",
+  "properties": {
+   "op": {"type": "string", "enum": ["new", "send", "capture", "kill", "list", "sendline"], "description": "new=建会话 / send=发命令并返回回显 / capture=只截当前屏 / kill=结束 / list=列出所有"},
+   "session": {"type": "string", "description": "会话名, 默认ai"},
+   "cmd": {"type": "string", "description": "要执行的命令"},
+   "cwd": {"type": "string", "description": "new时的工作目录"},
+   "wait": {"type": "number", "description": "发命令后等待秒数, 默认1.2"},
+   "lines": {"type": "integer", "description": "截屏回溯行数, 默认300"},
+   "then": {"type": "string", "description": "后续追加的多行命令(\\n分隔), 逐条发送"}
+  },
+  "required": ["op"]
+ },
+ "exec": "/opt/deepseek-bot/knowledge/toolPlugins/shell_session.py",
+ "admin_only": true,
+ "timeout": 120
+}
