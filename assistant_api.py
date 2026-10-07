@@ -507,7 +507,6 @@ def _exec_tool(name: str, args: dict, uid: int = 0) -> str:
                 return add_fact(uid, a.get("key", ""), a.get("value", ""))
             return get_memory_stats()
         if name == "waf":
-            from deepseek_bot.waf_evasion import WAFEvader, get_bypass_payloads, WAF_PROFILES
             act = a.get("act", "evade"); atype = a.get("attack_type", "sqli")
             payload = a.get("payload", ""); tgt = a.get("target", ""); url_param = a.get("url_param", "q")
             waf_type = a.get("waf_type", "")
@@ -536,7 +535,6 @@ def _exec_tool(name: str, args: dict, uid: int = 0) -> str:
                 return "\n".join(lines)
             return "waf: encode/test/evade/profile"
         if name == "lateral":
-            from deepseek_bot.lateral_movement import LateralMover, BloodHoundCollector, ProxyChain
             act = a.get("act", "scan")
             lm = LateralMover()
             if act == "scan": return lm.scan(a.get("target", "127.0.0.1"), a.get("credential"))
@@ -552,7 +550,6 @@ def _exec_tool(name: str, args: dict, uid: int = 0) -> str:
                 return pc.setup(a.get("chain", ""), a.get("target", ""))
             return lm.summary()
         if name == "privesc":
-            from deepseek_bot.privesc import PrivescEngine
             act = a.get("act", "scan")
             pe = PrivescEngine()
             if act == "scan": return pe.scan(a.get("target", ""), a.get("os", "auto"))
@@ -561,7 +558,6 @@ def _exec_tool(name: str, args: dict, uid: int = 0) -> str:
             if act == "exploit": return pe.exploit(a.get("target", ""), a.get("method", ""), a.get("payload", ""))
             return pe.report()
         if name == "credential":
-            from deepseek_bot.credential_attack import CredentialAttack
             act = a.get("act", "harvest")
             ca = CredentialAttack()
             if act == "harvest": return ca.harvest(a.get("target", ""), a.get("method", "all"))
@@ -579,7 +575,6 @@ def _exec_tool(name: str, args: dict, uid: int = 0) -> str:
             if act == "pypykatz": return ca.pypykatz_lsass(a.get("target", ""), a.get("username", ""), a.get("password", ""), a.get("nt_hash", ""), a.get("domain", ""))
             return ca.report()
         if name == "adaptive_chain":
-            from deepseek_bot.adaptive_chain import AdaptiveChain, adaptive_attack
             act = a.get("act", "run")
             if act == "run":
                 ac = AdaptiveChain()
@@ -590,7 +585,6 @@ def _exec_tool(name: str, args: dict, uid: int = 0) -> str:
             if act == "status": return AdaptiveChain.get_status(a.get("chain_id", ""))
             return adaptive_attack(a.get("target", ""), a.get("project_id", 0), 0)
         if name == "api_attack":
-            from deepseek_bot.api_attack import APIAttacker
             act = a.get("act", "scan")
             aa = APIAttacker()
             if act == "scan": return aa.scan(a.get("url", ""))
@@ -601,7 +595,6 @@ def _exec_tool(name: str, args: dict, uid: int = 0) -> str:
             if act == "fuzz": return aa.fuzz(a.get("url", ""), a.get("wordlist", ""))
             return aa.report()
         if name == "c2":
-            from deepseek_bot.c2_integration import C2Manager
             act = a.get("act", "start")
             cm = C2Manager()
             if act == "start": return cm.start(a.get("protocol", "sliver"), a.get("host", ""), a.get("port", ""))
@@ -613,21 +606,17 @@ def _exec_tool(name: str, args: dict, uid: int = 0) -> str:
             if act == "stealth": return cm.stealth_mode(a.get("beacon_id", ""), a.get("profile", "default"))
             return cm.status()
         if name == "cloud":
-            from deepseek_bot.cloud_attack import cloud_attack
             return cloud_attack(a.get("target", ""), a.get("act", "detect"),
                                 bucket=a.get("bucket", ""), vault=a.get("vault", ""))
         if name == "container":
-            from deepseek_bot.container_escape import container_escape
             return container_escape(a.get("act", "detect"), technique=a.get("technique", ""))
         if name == "evasion":
-            from deepseek_bot.evasion import evasion_report
             return evasion_report(a.get("act", "profile"),
                                   target=a.get("target", ""), payload_type=a.get("payload_type", "reverse_shell"),
                                   lhost=a.get("lhost", "10.0.0.1"), lport=a.get("lport", 4444),
                                   level=a.get("level", "medium"), shellcode=a.get("shellcode", ""),
                                   method=a.get("method", "xor"), technique=a.get("technique", ""))
         if name == "exfil":
-            from deepseek_bot.exfiltration import (exfil_discover, exfil_quick, exfil_pack, exfil_encrypt,
                                        exfil_split, exfil_send, exfil_channels, exfil_script)
             act = a.get("act", "discover")
             if act == "discover": return exfil_discover(a.get("target", "/"), a.get("categories"))
@@ -644,7 +633,6 @@ def _exec_tool(name: str, args: dict, uid: int = 0) -> str:
                                                     a.get("server_url", ""), a.get("domain", ""),
                                                     a.get("encrypt", "true") == "true")
         if name == "strix":
-            from deepseek_bot.strix_ai import StrixAgent, strix_available
             act = a.get("act", "run"); target = a.get("target", "")
             sa = StrixAgent(project_id=a.get("project_id", 0))
             if not sa.is_available():

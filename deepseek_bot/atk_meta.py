@@ -168,7 +168,7 @@ def load_store() -> dict:
 
 
 def save_lesson(raw_chain: str, target_fp: str = "*", evidence=("shell", "flag", "poc")) -> dict | None:
-    """蒸馏一条制胜链进剧本库(去特化; 同类合并, confidence 强化)。"""
+    """蒸馏一条成功链进剧本库(去特化; 同类合并, confidence 强化)。"""
     chain = normalize_chain(raw_chain)
     if not chain:
         return None

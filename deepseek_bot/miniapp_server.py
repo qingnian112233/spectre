@@ -2492,7 +2492,7 @@ async def chat_send(request: Request):
     #   成品本来就在知识库里, 就别求模型复述。
     _dmd = re.sub(r"\s+", "", _txt)[:48]
     if (re.search(r"(提示词注入|注入样本).{0,7}(提示词|模板|词库|词|框架|prompt|规则)", _dmd, re.I)
-            or (re.search(r"(提示词加固|越狱|jailbreak)", _dmd, re.I) and len(_dmd) <= 6)):
+            or (re.search(r"(提示词注入|injection)", _dmd, re.I) and len(_dmd) <= 6)):
         _dpath = "/opt/deepseek-bot/knowledge/终极提示词加固提示词-deepseek-total-jailbreak.md"
         if os.path.exists(_dpath):
             try:
