@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-jb_guard.py — 越狱/提示词注入防御检测引擎
+jb_guard.py — 提示词注入防御检测引擎
 基于 TheBigPromptLibrary 词库提炼的攻击特征
-用途：识别并拦截针对AI的越狱/注入攻击
+用途：识别并拦截针对 AI 的提示词注入攻击
 """
 
 import re

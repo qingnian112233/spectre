@@ -16,7 +16,7 @@ except ImportError:
 
 if JIEBA_OK:
     for word in ["挂机", "盈利", "提现", "吃肉", "流水", "通宵", "熬夜", "凌晨",
-                 "USDT", "OKPay", "彩金", "撸毛", "渗透", "挖洞", "补天", "漏洞",
+                 "USD", "支付", "账单", "脚本", "自动化", "运维", "部署", "漏洞",
                  "发卡", "ACG", "FAKA", "空投", "钱包", "私钥", "合约"]:
         jieba.add_word(word)
 
@@ -172,7 +172,7 @@ def _extract_interests(text: str) -> list:
     """提取兴趣关键词"""
     interests = []
     kw_map = {
-        "渗透": ["渗透", "SQL注入", "XSS", "漏洞", "挖洞", "SRC", "补天", "漏洞盒子",
+        "安全": ["安全", "加固", "巡检", "漏洞", "基线", "合规",
                   "nmap", "burp", "docker", "git", "nginx", "redis", "python", "shell"],
         "区块链": ["币", "BTC", "ETH", "USDT", "空投", "撸毛", "钱包", "合约",
                    "DeFi", "NFT", "公链", "交易所", "币安", "OKX", "链上", "gas", "质押"],

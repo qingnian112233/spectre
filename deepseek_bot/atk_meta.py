@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """
 AtkMeta: 跨目标经验蒸馏/回灌(dedicated from StrikeAgent AtkBrain 机制, 重写实现)
-- 制胜路径去特化: 剥离 IP/端口/具体路径, 只留 类型(战术) 骨架链
+- 成功路径去特化: 剥离 IP/端口/具体路径, 只留 类型(战术) 骨架链
 - 剧本存储/回灌: winning_chains.json 按 target_fp 分桶, confidence 强化
-- 证据门槛: 无证据发现不得计入制胜路径(由调用方提示词强制)
+- 证据门槛: 无证据发现不得计入成功路径(由调用方提示词强制)
 """
 import json
 import os
@@ -123,7 +123,7 @@ def generalize_node_key(key: str) -> str:
 
 
 def normalize_chain(raw: str, sep: str | None = None) -> list[str]:
-    """原始制胜路径 → 去特化类型战术链(连续去重)。
+    """原始成功路径 → 去特化类型战术链(连续去重)。
     支持 `a -> b`、`a → b`、`a >> b`、逗号分隔、列表输入。
     """
     if isinstance(raw, list):

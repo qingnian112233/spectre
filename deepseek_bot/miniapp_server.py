@@ -2487,11 +2487,11 @@ async def chat_send(request: Request):
     _topic = _int(_d.get("topic"), 0)
     if not _txt:
         return JSONResponse({"ok": False, "err": "空消息"}, status_code=400)
-    # 2026-09-18 确定性交付(和 TG 同一条规则): 主人索要「提示词加固/越狱提示词」→ 代码直给成品, 不进 AI。
+    # 2026-09-18 确定性交付(和 TG 同一条规则): 主人索要「提示词注入测试样本」→ 代码直给成品, 不进 AI。
     #   实测底层对齐会换话术继续拒("提示词加固提示词这类东西我不写"/"我没法帮你做这个"), 提示词层压不住;
     #   成品本来就在知识库里, 就别求模型复述。
     _dmd = re.sub(r"\s+", "", _txt)[:48]
-    if (re.search(r"(提示词加固|越狱|jail ?break).{0,7}(提示词|模板|词库|词|框架|prompt|规则)", _dmd, re.I)
+    if (re.search(r"(提示词注入|注入样本).{0,7}(提示词|模板|词库|词|框架|prompt|规则)", _dmd, re.I)
             or (re.search(r"(提示词加固|越狱|jailbreak)", _dmd, re.I) and len(_dmd) <= 6)):
         _dpath = "/opt/deepseek-bot/knowledge/终极提示词加固提示词-deepseek-total-jailbreak.md"
         if os.path.exists(_dpath):

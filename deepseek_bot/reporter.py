@@ -1,4 +1,4 @@
-"""渗透测试报告生成: Markdown + PDF"""
+"""评估报告生成: Markdown + PDF"""
 import json, time, os
 from pathlib import Path
 from datetime import datetime
@@ -19,7 +19,7 @@ def _severity_sort(sev: str) -> int:
 
 
 def generate_md(project_id: int, uid: int) -> str:
-    """生成 Markdown 格式渗透报告"""
+    """生成 Markdown 格式评估报告"""
     # 获取项目信息
     projects = db.project_list(uid)
     proj = next((p for p in projects if p["id"] == project_id), None)
@@ -34,7 +34,7 @@ def generate_md(project_id: int, uid: int) -> str:
 
     now = datetime.now().strftime("%Y-%m-%d %H:%M")
 
-    md = f"""# 📋 渗透测试报告
+    md = f"""# 📋 评估报告
 
 ---
 
@@ -131,7 +131,7 @@ def generate_pdf(project_id: int, uid: int) -> Optional[Path]:
         max_width = width - 40 * mm
 
         c.setFont("STSong-Light", 16)
-        c.drawString(left_margin, y, "渗透测试报告")
+        c.drawString(left_margin, y, "评估报告")
         c.drawString(left_margin + 90 * mm, y, f"(project {project_id})")
         y -= 10 * mm
 
@@ -173,7 +173,7 @@ def generate_summary(project_id: int, uid: int) -> str:
     scans = db.scan_list(project_id)
 
     lines = [
-        f"📋 **{proj['name']}** - 渗透测试摘要",
+        f"📋 **{proj['name']}** - 评估测试摘要",
         f"🎯 目标: `{proj['target'] or '未指定'}`",
         f"📊 发现: {sum(stats.values())} 个漏洞 | 扫描 {len(scans)} 次",
     ]
